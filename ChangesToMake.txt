@@ -1,0 +1,61 @@
+
+			--CHANGES TO BE MADE--
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		1-CHANGING SEARCH PARAMTERS
+	
+	When searching we want to make the following changes
+		! Only search for english tweets, the list of paramters for the search funtion can be found here https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
+			(it still seems like we are pulling non-english tweets into our raw file.)
+			(rather than researching we will just delete these by hand while labeling, they are very sparse)
+		! Only pull tweets that contain at least one word
+			(i.e. no tweets are only emojis, links, and @someones)
+			(similarly, we will delete these by hand in the files we have already pulled)
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		
+		2-CREATING NEW FILE OF FILTERED TWEETS 
+
+	In filtered_tweets we want to copy raw_tweets with the following changes.
+			*** We will have to slim down the characters we allow in as the input tweet will now be 2D rather than 1D which is more exclusive ***
+		* change ---G---, ---N---, or ---B--- on the last line to be 100 010 and 001 respectivly, these labels should go on the line right below the tweet they correspond to
+		* Change the filter function so that it takes a raw_tweet file and converts the strings stored int he raw file into a new filtered_tweet file.
+		! change "@" to "at" when it isnt part of @someone
+		! "&amp" should be changed to "and"
+		! ":" and ";" should be changed to a space
+		! "-" and "_" should changed to a space
+		! remove the characters * and "
+		! change all punctuation to periods
+		! every comma should be converted into a space
+		! When there is more than one @someone in a row, we only want to store one SOMONE
+			(so @person1@person2 @person3 @Wendys @person4@person5,   will be converted to SOMEONE COMPANY SOMONE)
+
+	The goal of this filtering is to have all tweets be made entirly of alphabet characters, sapces, periods, and apostraphys
+	If any other chacters are present in the tweets, the filtering processes should be amended accordingly
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		3-PARSING THE TWEETS TO INPUT DATA
+	
+	We need to take what we have in the filtered tweet file and normalize it to doubles between 0.0 and 1.0
+		* Chnage input to 2D binary representation of the tweet, i.e. a = [0, 0, 0, 1], b = [0, 0, 1, 0]
+		* All characters will be treated as lower case
+		* Each tweet will be stored as a list of doubles where each letter will be trasnformed by the function 
+			n = { ((int) letter.toLower() - 95) / 27 if letter \in {a, b, c, . . ., z}
+			  = {  0                                 if letter = space or period
+		* Each list should then be stored in a dict with its corresponding 1-hot lable of [1, 0, 0], [0, 1, 0] or [0, 0, 1]
+		* Possibly store all these converted numbers into a textfile called inputdata.txt
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+		4-CHANGES TO THE MODEL
+	
+		* Try L1,2 norm to get more spaces kernels
+		* Change model from 1D to 2D with a trivial second dimension, kernels should respond better
+			- will have to change demensionality of falttened tensors
+		* Finish writing new optomizer
+		* Create proper feed-dict for new 1-hot lables
